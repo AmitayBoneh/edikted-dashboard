@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>edikted â Catalog Intelligence</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>ðï¸</text></svg>"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'DM Sans',sans-serif;background:#FAFAFA;color:#111;-webkit-font-smoothing:antialiased}
+    :root{--red:#E60023;--black:#111;--white:#fff;--gray:#F5F5F5;--gray2:#E8E8E8;--gray3:#999;--green:#1B7340;--amber:#F59E0B}
+    ::selection{background:var(--red);color:white}
+    .fade-in{animation:fadeIn .4s ease-out}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes slideRight{from{width:0}to{width:100%}}
+    @keyframes countUp{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+    .count-up{animation:countUp .5s cubic-bezier(.2,.8,.2,1)}
+    .hover-lift{transition:transform .2s,box-shadow .2s}
+    .hover-lift:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(0,0,0,.08)}
+    table{border-collapse:collapse;width:100%}
+    th{text-transform:uppercase;letter-spacing:.06em;font-size:11px;font-weight:700}
+    td{font-size:13px}
+    ::-webkit-scrollbar{width:6px;height:6px}
+    ::-webkit-scrollbar-thumb{background:#ddd;border-radius:3px}
+  </style>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
+  <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const {useState,useMemo,useEffect,useRef}=React;
+    const {BarChart,Bar,XAxis,YAxis,Tooltip,ResponsiveContainer,PieChart,Pie,Cell,CartesianGrid,Legend,AreaChart,Area,RadialBarChart,RadialBar}=Recharts;
+
+    const DATA={"kpis":{"uniqueProducts":6214,"totalListings":15907,"inStock":5191,"outOfStock":1023,"inStockPct":83.5,"onSale":3944,"onSalePct":63.5,"avgPrice":406,"medPrice":377,"avgOrig":710,"avgSavings":304,"totalRevenue":2076823,"lostRevenue":442979},"sections":[{"name":"New In","total":949,"inStock":822,"outOfStock":127,"onSale":233,"avgPrice":478,"medPrice":439,"revenue":385705,"lostRevenue":67789},{"name":"Best Sellers","total":189,"inStock":162,"outOfStock":27,"onSale":52,"avgPrice":498,"medPrice":502,"revenue":81589,"lostRevenue":12613},{"name":"Swim","total":112,"inStock":104,"outOfStock":8,"onSale":72,"avgPrice":350,"medPrice":347,"revenue":35936,"lostRevenue":3262},{"name":"Tops","total":2437,"inStock":1918,"outOfStock":519,"onSale":1484,"avgPrice":361,"medPrice":339,"revenue":691629,"lostRevenue":187362},{"name":"Bottoms","total":1566,"inStock":1345,"outOfStock":221,"onSale":940,"avgPrice":518,"medPrice":502,"revenue":695546,"lostRevenue":115157},{"name":"Dresses","total":416,"inStock":330,"outOfStock":86,"onSale":257,"avgPrice":573,"medPrice":544,"revenue":186908,"lostRevenue":51404},{"name":"Sets","total":1157,"inStock":969,"outOfStock":188,"onSale":744,"avgPrice":453,"medPrice":439,"revenue":435960,"lostRevenue":88579},{"name":"Outerwear","total":894,"inStock":730,"outOfStock":164,"onSale":666,"avgPrice":572,"medPrice":544,"revenue":420138,"lostRevenue":90849},{"name":"Clothing","total":4959,"inStock":4088,"outOfStock":871,"onSale":3013,"avgPrice":459,"medPrice":418,"revenue":1873427,"lostRevenue":401339},{"name":"Accessories","total":956,"inStock":910,"outOfStock":46,"onSale":634,"avgPrice":141,"medPrice":113,"revenue":128681,"lostRevenue":6384},{"name":"Trending","total":271,"inStock":249,"outOfStock":22,"onSale":25,"avgPrice":467,"medPrice":439,"revenue":117093,"lostRevenue":9575},{"name":"50-60% Off","total":2001,"inStock":1756,"outOfStock":245,"onSale":2001,"avgPrice":362,"medPrice":347,"revenue":635993,"lostRevenue":88407}],"types":[{"name":"Top","count":976},{"name":"Tank Top","count":498},{"name":"Dress","count":396},{"name":"Shorts","count":337},{"name":"T-Shirt","count":332},{"name":"Jeans","count":305},{"name":"Sweater","count":281},{"name":"Skirt","count":233},{"name":"Skort","count":203},{"name":"Strapless","count":189},{"name":"Pants","count":184},{"name":"Hoodie","count":178},{"name":"Sweatpants","count":177},{"name":"Bracelet","count":140},{"name":"Necklace","count":139},{"name":"Corset","count":135},{"name":"Belt","count":119},{"name":"Knitted Top","count":107},{"name":"Cardigan","count":107},{"name":"Short Jeans","count":93}],"colors":[{"name":"BLUE","count":1119},{"name":"BLACK","count":976},{"name":"WHITE","count":896},{"name":"GRAY","count":534},{"name":"BROWN","count":455},{"name":"PINK","count":415},{"name":"RED","count":368},{"name":"GOLD","count":265},{"name":"YELLOW","count":186},{"name":"SILVER","count":185},{"name":"GREEN","count":166},{"name":"BEIGE","count":111},{"name":"PURPLE","count":86}],"priceDistribution":[{"range":"<âª100","count":359},{"range":"âª100-200","count":503},{"range":"âª200-300","count":1114},{"range":"âª300-400","count":1385},{"range":"âª400-500","count":931},{"range":"âª500-750","count":1572},{"range":"âª750-1K","count":307},{"range":">âª1K","count":43}],"discounts":[{"tier":"30%","count":2270},{"tier":"40%","count":1628},{"tier":"50%","count":909},{"tier":"60%","count":1406}],"styles":[{"name":"Long Sleeve","count":1188},{"name":"Sets","count":1146},{"name":"Low Rise","count":927},{"name":"Evening Wear","count":885},{"name":"Mini","count":809},{"name":"Knitted","count":722},{"name":"Outerwear","count":693},{"name":"Graphic","count":587},{"name":"Denim","count":546},{"name":"Halter","count":506},{"name":"Oversize","count":493},{"name":"Shorts","count":430},{"name":"Basic","count":361},{"name":"T-Shirt","count":330},{"name":"Off Shoulder","count":329}],"oosAlerts":[{"type":"Crop Top","total":84,"oos":29,"rate":34.5},{"type":"Corset","total":135,"oos":39,"rate":28.9},{"type":"Cardigan","total":107,"oos":28,"rate":26.2},{"type":"Short Jeans","total":93,"oos":23,"rate":24.7},{"type":"Tank Top","total":498,"oos":113,"rate":22.7},{"type":"T-Shirt","total":332,"oos":75,"rate":22.6},{"type":"Dress","total":396,"oos":84,"rate":21.2},{"type":"Top","total":976,"oos":200,"rate":20.5},{"type":"Sweater","total":281,"oos":56,"rate":19.9},{"type":"Shorts","total":337,"oos":64,"rate":19.0},{"type":"Bodysuit","total":55,"oos":10,"rate":18.2}],"sectionPrices":[{"section":"New In","avg":478,"min":113,"max":1904},{"section":"Best Sellers","avg":510,"min":75,"max":1025},{"section":"Swim","avg":347,"min":201,"max":544},{"section":"Tops","avg":346,"min":142,"max":774},{"section":"Bottoms","avg":504,"min":159,"max":963},{"section":"Dresses","avg":563,"min":264,"max":1695},{"section":"Sets","avg":561,"min":280,"max":1465},{"section":"Outerwear","avg":560,"min":264,"max":1883},{"section":"Accessories","avg":136,"min":33,"max":607},{"section":"50-60% Off","avg":467,"min":314,"max":628}],"topExpensive":[{"name":"Jaicee High Neck Oversized Faux Leather Jacket","type":"Jacket","price":1904,"orig":2720,"disc":"30%"},{"name":"Elira Iridescent Fitted Jacket","type":"Jacket","price":1883,"orig":3118,"disc":"40%"},{"name":"Evonka Fringe Faux Suede Jacket","type":"Jacket","price":1716,"orig":2448,"disc":"30%"},{"name":"Backless Chainmail Cowl Neck Mini Dress","type":"Dress","price":1695,"orig":2427,"disc":"30%"},{"name":"Zayna Cropped Faux Leather Bomber Jacket","type":"Jacket","price":1695,"orig":2427,"disc":"30%"},{"name":"Jaxson Oversized Faux Leather Bomber Jacket","type":"Jacket","price":1590,"orig":2260,"disc":"30%"},{"name":"Hooded Vintage Washed Denim Bomber Jacket","type":"Jacket","price":1590,"orig":2260,"disc":"30%"},{"name":"Marney Oversized Studded Denim Hoodie","type":"Hoodie","price":1486,"orig":2113,"disc":"30%"},{"name":"Cozette Faux Leather Jacket","type":"Jacket","price":1486,"orig":2113,"disc":"30%"},{"name":"Zaira Buckle Faux Leather Jacket","type":"Jacket","price":1465,"orig":2072,"disc":"30%"}],"topCheap":[{"name":"Happy Go Lucky Socks","type":"Socks","price":33,"orig":84,"disc":"60%"},{"name":"Floral Socks","type":"Socks","price":33,"orig":84,"disc":"60%"},{"name":"Star Claw Clip","type":"Hairclip","price":33,"orig":84,"disc":"60%"},{"name":"Embroidered Bow Socks","type":"Socks","price":42,"orig":105,"disc":"60%"},{"name":"Pointelle Polka Dot Socks","type":"Socks","price":42,"orig":105,"disc":"60%"},{"name":"Fargo Chain Necklace","type":"Necklace","price":42,"orig":84,"disc":"50%"},{"name":"Contrast Frilly Socks","type":"Socks","price":42,"orig":105,"disc":"60%"},{"name":"Everyday Striped Socks","type":"Socks","price":42,"orig":105,"disc":"60%"},{"name":"Pearly Bow Bag Charm","type":"Key Chain","price":42,"orig":105,"disc":"60%"}]};
+
+    const CHART_COLORS=['#E60023','#111','#555','#999','#CCC','#F5A623','#4ECDC4','#45B7D1'];
+    const COLOR_MAP={BLUE:'#4A90D9',BLACK:'#111',WHITE:'#CCC',GRAY:'#888',BROWN:'#8B6914',PINK:'#E91E8A',RED:'#E60023',GOLD:'#D4A843',YELLOW:'#E8C840',SILVER:'#A0A0A0',GREEN:'#4A7C59',BEIGE:'#C8B894',PURPLE:'#7B4FA0'};
+    const fmt=n=>n>=1e6?`âª${(n/1e6).toFixed(1)}M`:n>=1e3?`âª${(n/1e3).toFixed(0)}K`:`âª${n}`;
+
+    /* âââ Animated Counter âââ */
+    function AnimNum({value,prefix='',suffix='',duration=800}){
+      const[display,setDisplay]=useState(0);
+      const num=typeof value==='number'?value:parseFloat(String(value).replace(/[^0-9.]/g,''))||0;
+      useEffect(()=>{
+        let start=0;const step=num/((duration/16));
+        const id=setInterval(()=>{start+=step;if(start>=num){setDisplay(num);clearInterval(id)}else setDisplay(Math.round(start))},16);
+        return()=>clearInterval(id);
+      },[num]);
+      return <span>{prefix}{display.toLocaleString()}{suffix}</span>;
+    }
+
+    /* âââ Progress Bar âââ */
+    function ProgressBar({value,max=100,color='var(--red)',height=6}){
+      const pct=Math.min((value/max)*100,100);
+      return(
+        <div style={{background:'#EEE',borderRadius:height/2,height,overflow:'hidden',width:'100%'}}>
+          <div style={{background:color,height:'100%',borderRadius:height/2,width:`${pct}%`,transition:'width 1s cubic-bezier(.2,.8,.2,1)'}}/>
+        </div>
+      );
+    }
+
+    /* âââ Sparkline mini chart âââ */
+    function Sparkline({data,color='var(--red)',height=40}){
+      const max=Math.max(...data);const min=Math.min(...data);const range=max-min||1;
+      const w=120;const pts=data.map((v,i)=>`${(i/(data.length-1))*w},${height-((v-min)/range)*(height-4)-2}`).join(' ');
+      return <svg width={w} height={height} style={{display:'block'}}><polyline points={pts} fill="none" stroke={color} strokeWidth="2"/></svg>;
+    }
+
+    /* âââ Tooltip âââ */
+    const ChartTip=({active,payload,label})=>{
+      if(!active||!payload?.length)return null;
+      return(
+        <div style={{background:'white',padding:'10px 14px',border:'1px solid #E8E8E8',boxShadow:'0 4px 20px rgba(0,0,0,.08)',fontSize:12,fontFamily:'DM Sans'}}>
+          <div style={{fontWeight:700,marginBottom:4,letterSpacing:'-.02em'}}>{label}</div>
+          {payload.map((p,i)=><div key={i} style={{color:p.color||'#111'}}>{p.name}: {typeof p.value==='number'&&p.value>999?p.value.toLocaleString():p.value}</div>)}
+        </div>
+      );
+    };
+
+    /* âââ Sortable Table âââ */
+    function SortTable({columns,data,accent='var(--red)'}){
+      const[sortCol,setSortCol]=useState(null);
+      const[sortDir,setSortDir]=useState('desc');
+      const sorted=useMemo(()=>{
+        if(sortCol===null)return data;
+        return[...data].sort((a,b)=>{
+          const va=a[sortCol],vb=b[sortCol];
+          const na=typeof va==='string'?parseFloat(va.replace(/[^0-9.-]/g,''))||0:va;
+          const nb=typeof vb==='string'?parseFloat(vb.replace(/[^0-9.-]/g,''))||0:vb;
+          if(typeof va==='string'&&isNaN(na))return sortDir==='asc'?String(va).localeCompare(String(vb)):String(vb).localeCompare(String(va));
+          return sortDir==='asc'?na-nb:nb-na;
+        });
+      },[data,sortCol,sortDir]);
+      const toggleSort=(i)=>{if(sortCol===i)setSortDir(d=>d==='asc'?'desc':'asc');else{setSortCol(i);setSortDir('desc')}};
+      return(
+        <div style={{overflow:'auto',borderRadius:8,border:'1px solid #E8E8E8'}}>
+          <table>
+            <thead><tr style={{background:'#111',color:'white'}}>
+              {columns.map((c,i)=>(
+                <th key={i} onClick={()=>toggleSort(i)} style={{padding:'12px 14px',textAlign:c.align||'left',cursor:'pointer',userSelect:'none',whiteSpace:'nowrap'}}>
+                  {c.label} {sortCol===i?(sortDir==='asc'?'â':'â'):''}
+                </th>
+              ))}
+            </tr></thead>
+            <tbody>
+              {sorted.map((row,ri)=>(
+                <tr key={ri} style={{background:ri%2?'#FAFAFA':'white',transition:'background .15s'}} onMouseEnter={e=>e.currentTarget.style.background='#FFF0F0'} onMouseLeave={e=>e.currentTarget.style.background=ri%2?'#FAFAFA':'white'}>
+                  {row.map((cell,ci)=>(
+                    <td key={ci} style={{padding:'10px 14px',textAlign:columns[ci]?.align||'left',fontWeight:columns[ci]?.bold?700:400,color:columns[ci]?.color||'inherit'}}>{cell}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+
+    /* âââââââââââââââ MAIN DASHBOARD âââââââââââââââ */
+    function Dashboard(){
+      const[tab,setTab]=useState('overview');
+      const[hoveredKpi,setHoveredKpi]=useState(null);
+      const d=DATA;const k=d.kpis;
+
+      const tabs=[
+        {id:'overview',label:'Overview'},
+        {id:'sections',label:'Sections'},
+        {id:'products',label:'Products & Colors'},
+        {id:'pricing',label:'Pricing'},
+        {id:'alerts',label:'Stock Alerts'},
+      ];
+
+      const stockData=[{name:'In Stock',value:k.inStock,fill:'#111'},{name:'Out of Stock',value:k.outOfStock,fill:'#E60023'}];
+      const saleData=[{name:'On Sale',value:k.onSale,fill:'#E60023'},{name:'Full Price',value:k.uniqueProducts-k.onSale,fill:'#E8E8E8'}];
+
+      const revData=d.sections.filter(s=>!['Clothing'].includes(s.name)).map(s=>({
+        name:s.name.length>12?s.name.slice(0,11)+'.':s.name,
+        revenue:Math.round(s.revenue/1000),lost:Math.round(s.lostRevenue/1000)
+      }));
+
+      const KPI=({label,value,sub,red,i})=>(
+        <div className="hover-lift count-up" onMouseEnter={()=>setHoveredKpi(i)} onMouseLeave={()=>setHoveredKpi(null)}
+          style={{background:hoveredKpi===i?'#111':'white',color:hoveredKpi===i?'white':'#111',
+            borderRadius:0,padding:'24px 20px',border:'1px solid #E8E8E8',flex:'1 1 180px',minWidth:180,
+            transition:'all .25s cubic-bezier(.2,.8,.2,1)',cursor:'default'}}>
+          <div style={{fontSize:11,textTransform:'uppercase',letterSpacing:'.08em',color:hoveredKpi===i?'#999':'#999',marginBottom:8}}>{label}</div>
+          <div style={{fontSize:28,fontFamily:"'Playfair Display',serif",fontWeight:900,letterSpacing:'-.03em',color:red&&hoveredKpi!==i?'var(--red)':'inherit'}}>{value}</div>
+          {sub&&<div style={{fontSize:11,color:hoveredKpi===i?'#777':'#999',marginTop:4}}>{sub}</div>}
+        </div>
+      );
+
+      return(
+        <div style={{minHeight:'100vh',background:'#FAFAFA'}}>
+          {/* âââ HEADER âââ */}
+          <header style={{background:'#111',color:'white',padding:'0 40px',position:'sticky',top:0,zIndex:100}}>
+            <div style={{maxWidth:1280,margin:'0 auto',display:'flex',justifyContent:'space-between',alignItems:'center',height:64}}>
+              <div style={{display:'flex',alignItems:'baseline',gap:16}}>
+                <span style={{fontFamily:"'Playfair Display',serif",fontSize:24,fontWeight:900,letterSpacing:'-.02em'}}>edikted</span>
+                <span style={{fontSize:12,color:'#666',letterSpacing:'.05em',textTransform:'uppercase'}}>Catalog Intelligence</span>
+              </div>
+              <div style={{fontSize:12,color:'#666'}}>April 15, 2026</div>
+            </div>
+            {/* Nav */}
+            <div style={{maxWidth:1280,margin:'0 auto',display:'flex',gap:0,borderTop:'1px solid #222'}}>
+              {tabs.map(t=>(
+                <button key={t.id} onClick={()=>setTab(t.id)} style={{
+                  background:'none',border:'none',color:tab===t.id?'white':'#666',padding:'14px 24px',
+                  fontSize:12,fontWeight:600,cursor:'pointer',letterSpacing:'.04em',textTransform:'uppercase',
+                  borderBottom:tab===t.id?'2px solid var(--red)':'2px solid transparent',transition:'all .2s',fontFamily:'DM Sans'
+                }}>{t.label}</button>
+              ))}
+            </div>
+          </header>
+
+          <main style={{maxWidth:1280,margin:'0 auto',padding:'32px 40px'}} className="fade-in" key={tab}>
+
+            {/* âââ OVERVIEW âââ */}
+            {tab==='overview'&&<>
+              <div style={{display:'flex',flexWrap:'wrap',gap:12,marginBottom:32}}>
+                <KPI i={0} label="Unique Products" value={<AnimNum value={k.uniqueProducts}/>} sub={`${k.totalListings.toLocaleString()} total listings`}/>
+                <KPI i={1} label="In Stock" value={<><AnimNum value={k.inStockPct} suffix="%"/></>} sub={`${k.inStock.toLocaleString()} available`}/>
+                <KPI i={2} label="On Sale" value={<AnimNum value={k.onSalePct} suffix="%"/>} sub={`${k.onSale.toLocaleString()} discounted`} red/>
+                <KPI i={3} label="Avg Price" value={<AnimNum value={k.avgPrice} prefix="âª"/>} sub={`Was âª${k.avgOrig} Â· Save âª${k.avgSavings}`}/>
+                <KPI i={4} label="Revenue Potential" value={fmt(k.totalRevenue)} sub="All in-stock items"/>
+                <KPI i={5} label="Lost Revenue" value={fmt(k.lostRevenue)} sub={`${((k.lostRevenue/(k.totalRevenue+k.lostRevenue))*100).toFixed(1)}% at risk`} red/>
+              </div>
+
+              {/* Charts Row */}
+              <div style={{display:'grid',gridTemplateColumns:'200px 200px 1fr',gap:16,marginBottom:32}}>
+                {/* Stock Donut */}
+                <div style={{background:'white',padding:20,border:'1px solid #E8E8E8'}}>
+                  <div style={{fontSize:11,textTransform:'uppercase',letterSpacing:'.08em',color:'#999',marginBottom:12}}>Stock Status</div>
+                  <ResponsiveContainer width="100%" height={160}>
+                    <PieChart><Pie data={stockData} innerRadius={48} outerRadius={65} dataKey="value" paddingAngle={2} strokeWidth={0}>
+                      {stockData.map((e,i)=><Cell key={i} fill={e.fill}/>)}
+                    </Pie><Tooltip formatter={v=>v.toLocaleString()}/></PieChart>
+                  </ResponsiveContainer>
+                  <div style={{display:'flex',justifyContent:'center',gap:14,fontSize:11,marginTop:4}}>
+                    {stockData.map(s=><div key={s.name} style={{display:'flex',alignItems:'center',gap:4}}><div style={{width:8,height:8,background:s.fill}}/>{s.name}</div>)}
+                  </div>
+                </div>
+                {/* Sale Donut */}
+                <div style={{background:'white',padding:20,border:'1px solid #E8E8E8'}}>
+                  <div style={{fontSize:11,textTransform:'uppercase',letterSpacing:'.08em',color:'#999',marginBottom:12}}>Sale Status</div>
+                  <ResponsiveContainer width="100%" height={160}>
+                    <PieChart><Pie data={saleData} innerRadius={48} outerRadius={65} dataKey="value" paddingAngle={2} strokeWidth={0}>
+                      {saleData.map((e,i)=><Cell key={i} fill={e.fill}/>)}
+                    </Pie><Tooltip formatter={v=>v.toLocaleString()}/></PieChart>
+                  </ResponsiveContainer>
+                  <div style={{display:'flex',justifyContent:'center',gap:14,fontSize:11,marginTop:4}}>
+                    {saleData.map(s=><div key={s.name} style={{display:'flex',alignItems:'center',gap:4}}><div style={{width:8,height:8,background:s.fill,borderRadius:s.fill==='#E8E8E8'?0:0}}/>{s.name}</div>)}
+                  </div>
+                </div>
+                {/* Revenue Bar */}
+                <div style={{background:'white',padding:20,border:'1px solid #E8E8E8'}}>
+                  <div style={{fontSize:11,textTransform:'uppercase',letterSpacing:'.08em',color:'#999',marginBottom:12}}>Revenue by Section (âªK)</div>
+                  <ResponsiveContainer width="100%" height={185}>
+                    <BarChart data={revData} barGap={1}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#F0F0F0" vertical={false}/>
+                      <XAxis dataKey="name" tick={{fontSize:9,fill:'#999'}} axisLine={false} tickLine={false}/>
+                      <YAxis tick={{fontSize:9,fill:'#999'}} axisLine={false} tickLine={false}/>
+                      <Tooltip content={<ChartTip/>}/>
+                      <Bar dataKey="revenue" name="Revenue" fill="#111" radius={[2,2,0,0]}/>
+                      <Bar dataKey="lost" name="Lost" fill="#E60023" radius={[2,2,0,0]}/>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* Price + Discount */}
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16}}>
+                <div style={{background:'white',padding:24,border:'1px solid #E8E8E8'}}>
+                  <div style={{fontSize:11,textTransform:'uppercase',letterSpacing:'.08em',color:'#999',marginBottom:16}}>Price Distribution</div>
+                  <ResponsiveContainer width="100%" height={220}>
+                    <BarChart data={d.priceDistribution}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#F0F0F0" vertical={false}/>
+                      <XAxis dataKey="range" tick={{fontSize:10,fill:'#999'}} axisLine={false} tickLine={false}/>
+                      <YAxis tick={{fontSize:10,fill:'#999'}} axisLine={false} tickLine={false}/>
+                      <Tooltip content={<ChartTip/>}/>
+                      <Bar dataKey="count" name="Products" fill="#111" radius={[2,2,0,0]}/>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+                <div style={{background:'white',padding:24,border:'1px solid #E8E8E8'}}>
+                  <div style={{fontSize:11,textTransform:'uppercase',letterSpacing:'.08em',color:'#999',marginBottom:16}}>Discount Tiers</div>
+                  <div style={{display:'flex',flexDirection:'column',gap:16,marginTop:8}}>
+                    {d.discounts.map((disc,i)=>{
+                      const pct=(disc.count/k.uniqueProducts*100).toFixed(1);
+                      return(
+                        <div key={disc.tier}>
+                          <div style={{display:'flex',justifyContent:'space-between',marginBottom:6}}>
+                            <span style={{fontSize:14,fontWeight:700}}>{disc.tier} OFF</span>
+                            <span style={{fontSize:13,color:'#999'}}>{disc.count.toLocaleString()} items ({pct}%)</span>
+                          </div>
+                          <ProgressBar value={disc.count} max={2500} color={i===0?'#111':i===1?'#555':i===2?'#999':'#E60023'} height={8}/>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </>}
+
+            {/* âââ SECTIONS âââ */}
+            {tab==='sections'&&<>
+              <div style={{background:'white',padding:24,border:'1px solid #E8E8E8',marginBottom:24}}>
+                <div style={{fontSize:11,textTransform:'uppercase',letterSpacing:'.08em',color:'#999',marginBottom:16}}>Section Comparison â In Stock vs Out of Stock</div>
+                <ResponsiveContainer width="100%" height={380}>
+                  <BarChart data={d.sections.filter(s=>s.name!=='Clothing')} layout="vertical" barGap={0}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#F0F0F0" horizontal={false}/>
+                    <XAxis type="number" tick={{fontSize:10,fill:'#999'}} axisLine={false} tickLine={false}/>
+                    <YAxis dataKey="name" type="category" width={95} tick={{fontSize:12,fill:'#111',fontWeight:600}} axisLine={false} tickLine={false}/>
+                    <Tooltip content={<ChartTip/>}/>
+                    <Legend/>
+                    <Bar dataKey="inStock" name="In Stock" stackId="a" fill="#111"/>
+                    <Bar dataKey="outOfStock" name="Out of Stock" stackId="a" fill="#E60023"/>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              <SortTable columns={[
+                {label:'Section',bold:true},{label:'Products',align:'center'},{label:'In Stock',align:'center',color:'#1B7340'},
+                {label:'OOS',align:'center',color:'#E60023'},{label:'OOS %',align:'center'},{label:'On Sale',align:'center'},
+                {label:'Avg Price',align:'center'},{label:'Revenue',align:'center'},{label:'Lost Rev',align:'center'}
+              ]} data={d.sections.map(s=>[
+                s.name,s.total,s.inStock,s.outOfStock,
+                (s.outOfStock/s.total*100).toFixed(1)+'%',s.onSale,
+                'âª'+s.avgPrice,fmt(s.revenue),fmt(s.lostRevenue)
+              ])}/>
+            </>}
+
+            {/* âââ PRODUCTS âââ */}
+            {tab==='products'&&<>
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginBottom:24}}>
+                <div style={{background:'white',padding:24,border:'1px solid #E8E8E8'}}>
+                  <div style={{fontSize:11,textTransform:'uppercase',letterSpacing:'.08em',color:'#999',marginBottom:16}}>Top Product Types</div>
+                  <ResponsiveContainer width="100%" height={440}>
+                    <BarChart data={d.types.slice(0,15)} layout="vertical">
+                      <CartesianGrid strokeDasharray="3 3" stroke="#F0F0F0" horizontal={false}/>
+                      <XAxis type="number" tick={{fontSize:10,fill:'#999'}} axisLine={false} tickLine={false}/>
+                      <YAxis dataKey="name" type="category" width={85} tick={{fontSize:12,fill:'#111'}} axisLine={false} tickLine={false}/>
+                      <Tooltip content={<ChartTip/>}/>
+                      <Bar dataKey="count" name="Products" fill="#111" radius={[0,3,3,0]}/>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+                <div style={{background:'white',padding:24,border:'1px solid #E8E8E8'}}>
+                  <div style={{fontSize:11,textTransform:'uppercase',letterSpacing:'.08em',color:'#999',marginBottom:16}}>Color Palette</div>
+                  <ResponsiveContainer width="100%" height={440}>
+                    <BarChart data={d.colors} layout="vertical">
+                      <CartesianGrid strokeDasharray="3 3" stroke="#F0F0F0" horizontal={false}/>
+                      <XAxis type="number" tick={{fontSize:10,fill:'#999'}} axisLine={false} tickLine={false}/>
+                      <YAxis dataKey="name" type="category" width={65} tick={{fontSize:11,fill:'#111'}} axisLine={false} tickLine={false}/>
+                      <Tooltip content={<ChartTip/>}/>
+                      <Bar dataKey="count" name="Products" radius={[0,3,3,0]}>
+                        {d.colors.map((c,i)=><Cell key={i} fill={COLOR_MAP[c.name]||'#999'}/>)}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+              {/* Style Cloud */}
+              <div style={{background:'white',padding:24,border:'1px solid #E8E8E8'}}>
+                <div style={{fontSize:11,textTransform:'uppercase',letterSpacing:'.08em',color:'#999',marginBottom:16}}>Style Tags</div>
+                <div style={{display:'flex',flexWrap:'wrap',gap:8}}>
+                  {d.styles.map((s,i)=>{
+                    const ratio=s.count/d.styles[0].count;
+                    return(
+                      <span key={s.name} className="hover-lift" style={{
+                        padding:'8px 18px',border:ratio>.6?'none':'1px solid #E8E8E8',
+                        background:ratio>.6?'#111':'white',color:ratio>.6?'white':'#111',
+                        fontSize:11+Math.round(ratio*6),fontWeight:600,letterSpacing:'.02em',cursor:'default',transition:'all .2s'
+                      }}>{s.name} <span style={{opacity:.5,fontSize:11}}>({s.count})</span></span>
+                    );
+                  })}
+                </div>
+              </div>
+            </>}
+
+            {/* âââ PRICING âââ */}
+            {tab==='pricing'&&<>
+              <div style={{fontSize:11,textTransform:'uppercase',letterSpacing:'.08em',color:'#999',marginBottom:12}}>Most Expensive â Click headers to sort</div>
+              <SortTable columns={[
+                {label:'#',align:'center'},{label:'Product',bold:true},{label:'Type',align:'center'},
+                {label:'Sale Price',align:'center',color:'#E60023',bold:true},{label:'Original',align:'center'},
+                {label:'Discount',align:'center'},{label:'Savings',align:'center',color:'#1B7340',bold:true}
+              ]} data={d.topExpensive.map((p,i)=>[
+                i+1,p.name,p.type,'âª'+p.price.toLocaleString(),'âª'+p.orig.toLocaleString(),p.disc,'âª'+(p.orig-p.price).toLocaleString()
+              ])}/>
+
+              <div style={{fontSize:11,textTransform:'uppercase',letterSpacing:'.08em',color:'#999',margin:'28px 0 12px'}}>Price by Section â Range View</div>
+              <div style={{background:'white',padding:24,border:'1px solid #E8E8E8',marginBottom:28}}>
+                <ResponsiveContainer width="100%" height={280}>
+                  <BarChart data={d.sectionPrices}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#F0F0F0" vertical={false}/>
+                    <XAxis dataKey="section" tick={{fontSize:10,fill:'#999'}} axisLine={false} tickLine={false}/>
+                    <YAxis tick={{fontSize:10,fill:'#999'}} axisLine={false} tickLine={false}/>
+                    <Tooltip content={<ChartTip/>}/>
+                    <Bar dataKey="min" name="Min âª" fill="#E8E8E8" radius={[2,2,0,0]}/>
+                    <Bar dataKey="avg" name="Avg âª" fill="#111" radius={[2,2,0,0]}/>
+                    <Bar dataKey="max" name="Max âª" fill="#E60023" radius={[2,2,0,0]}/>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+
+              <div style={{fontSize:11,textTransform:'uppercase',letterSpacing:'.08em',color:'#999',marginBottom:12}}>Cheapest Products</div>
+              <SortTable columns={[
+                {label:'#',align:'center'},{label:'Product',bold:true},{label:'Type',align:'center'},
+                {label:'Price',align:'center',color:'#1B7340',bold:true},{label:'Original',align:'center'},{label:'Discount',align:'center'}
+              ]} data={d.topCheap.map((p,i)=>[i+1,p.name,p.type,'âª'+p.price,'âª'+p.orig,p.disc])}/>
+            </>}
+
+            {/* âââ ALERTS âââ */}
+            {tab==='alerts'&&<>
+              {/* Alert Banner */}
+              <div style={{background:'#111',color:'white',padding:'20px 24px',marginBottom:24,display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:12}}>
+                <div>
+                  <div style={{fontFamily:"'Playfair Display',serif",fontSize:22,fontWeight:900}}>
+                    {k.outOfStock.toLocaleString()} products out of stock
+                  </div>
+                  <div style={{fontSize:13,color:'#999',marginTop:4}}>{fmt(k.lostRevenue)} in potential lost revenue Â· {((k.lostRevenue/(k.totalRevenue+k.lostRevenue))*100).toFixed(1)}% of catalog at risk</div>
+                </div>
+                <div style={{background:'var(--red)',color:'white',padding:'10px 20px',fontSize:12,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase'}}>
+                  ACTION REQUIRED
+                </div>
+              </div>
+
+              <div style={{background:'white',padding:24,border:'1px solid #E8E8E8',marginBottom:24}}>
+                <div style={{fontSize:11,textTransform:'uppercase',letterSpacing:'.08em',color:'#999',marginBottom:16}}>Out-of-Stock Rate by Category</div>
+                <ResponsiveContainer width="100%" height={340}>
+                  <BarChart data={d.oosAlerts} layout="vertical">
+                    <CartesianGrid strokeDasharray="3 3" stroke="#F0F0F0" horizontal={false}/>
+                    <XAxis type="number" domain={[0,40]} tickFormatter={v=>`${v}%`} tick={{fontSize:10,fill:'#999'}} axisLine={false} tickLine={false}/>
+                    <YAxis dataKey="type" type="category" width={90} tick={{fontSize:12,fill:'#111'}} axisLine={false} tickLine={false}/>
+                    <Tooltip formatter={v=>`${v}%`}/>
+                    <Bar dataKey="rate" name="OOS Rate" radius={[0,3,3,0]}>
+                      {d.oosAlerts.map((a,i)=><Cell key={i} fill={a.rate>25?'#E60023':a.rate>20?'#111':'#999'}/>)}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+
+              <SortTable columns={[
+                {label:'Category',bold:true},{label:'Total',align:'center'},{label:'OOS',align:'center',color:'#E60023',bold:true},
+                {label:'OOS Rate',align:'center'},{label:'Status',align:'center'}
+              ]} data={d.oosAlerts.map(a=>[
+                a.type,a.total,a.oos,a.rate+'%',
+                a.rate>25?'â¬¤ CRITICAL':a.rate>20?'â WARNING':'â WATCH'
+              ])}/>
+            </>}
+
+          </main>
+
+          {/* Footer */}
+          <footer style={{borderTop:'1px solid #E8E8E8',padding:'20px 40px',textAlign:'center',fontSize:11,color:'#BBB',letterSpacing:'.03em'}}>
+            edikted.co.uk Â· {k.uniqueProducts.toLocaleString()} unique products Â· {d.sections.length} sections Â· Prices in âª (ILS) Â· Scraped April 15, 2026
+          </footer>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<Dashboard/>);
+  </script>
+</body>
+</html>
